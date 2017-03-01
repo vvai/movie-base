@@ -12,7 +12,7 @@
     </ul>
   </div>
   <div class="col-md-8 movies-list">
-    {% if user.get('username') %}
+    {% if user.get('id') %}
       <a class="btn btn-default add-movie-button" href="{{url_for('newMovie')}}">Add movie</a>
     {% endif %}
 

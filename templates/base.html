@@ -21,7 +21,7 @@
       </div>
       <div id="navbar">
         <ul class="nav navbar-nav pull-right">
-          {% if user.get('username') %}
+          {% if user.get('id') %}
             <li><a href="/gdisconnect">({{user.get('username')}}) Logout</a></li>
           {% else %}
             <li><a href="/login">Login</a></li>

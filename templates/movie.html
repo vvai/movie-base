@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  {% if user.get('username') %}
+  {% if user.get('id') == movie.user_id %}
     <div class="row movie-actions pull-right">
       <a class="btn btn-default" href="{{url_for('editMovie', genre_id=movie.genre_id, movie_id=movie.id)}}">Edit</a>
       <a class="btn btn-default" href="{{url_for('deleteMovie', genre_id=movie.genre_id, movie_id=movie.id)}}">Delete</a>

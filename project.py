@@ -3,7 +3,7 @@ from flask import redirect, jsonify, url_for, flash
 from flask import Flask, render_template, request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Genre, Movie
+from database_setup import Base, Genre, Movie, User
 from flask import session as login_session
 import random
 import string
@@ -22,11 +22,6 @@ engine = create_engine('sqlite:///moviebase.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-
-
-def is_logged_user():
-    """Check logged user."""
-    return 'username' not in login_session
 
 
 @app.route('/')
@@ -67,7 +62,9 @@ def showGenre(genre_id):
 def movie(genre_id, movie_id):
     """Show movie page."""
     movie = session.query(Movie).filter_by(id=movie_id).one()
-    return render_template('movie.html', movie=movie, user=login_session)
+    return render_template('movie.html',
+                           movie=movie,
+                           user=login_session)
 
 
 @app.route('/genre/movie/new/', methods=['GET', 'POST'])
@@ -75,13 +72,14 @@ def newMovie():
     """New movie page and form handler."""
     if request.method == 'POST':
         if 'username' not in login_session:
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
         genre_id = request.form['genre_id']
         newMovie = Movie(title=request.form['title'],
                          description=request.form['description'],
                          year=request.form['year'],
                          director=request.form['director'],
-                         genre_id=genre_id)
+                         genre_id=genre_id,
+                         user_id=login_session.get('id'))
         session.add(newMovie)
         session.commit()
         flash("Movie '%s' created" % newMovie.title)
@@ -99,7 +97,7 @@ def editMovie(genre_id, movie_id):
     """Edit movie page and form handler."""
     editedMovie = session.query(Movie).filter_by(id=movie_id).one()
     if request.method == 'POST':
-        if 'username' not in login_session:
+        if editedMovie.user_id != login_session.get('id'):
             return redirect(url_for('index'))
         if request.form['title']:
             editedMovie.title = request.form['title']
@@ -133,7 +131,7 @@ def deleteMovie(genre_id, movie_id):
     """Delete movie page and form handler."""
     movieToDelete = session.query(Movie).filter_by(id=movie_id).one()
     if request.method == 'POST':
-        if 'username' not in login_session:
+        if movieToDelete.user_id != login_session.get('id'):
             return redirect(url_for('index'))
         session.delete(movieToDelete)
         session.commit()
@@ -242,7 +240,23 @@ def gconnect():
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
+    login_session['google_id'] = data['id']
     # login_session['email'] = data['email']
+    print('getUser')
+    user = session.query(User).filter_by(google_id=data['id']).one()
+    print(user)
+    if not user:
+        print('newUser')
+        newUser = User(name=data['name'],
+                       google_id=data['id'])
+        session.add(newUser)
+        session.commit()
+        login_session['id'] = newUser.id
+        # login_session['user'] = newUser
+    else:
+        print('justUser')
+        login_session['id'] = user.id
+        # login_session['user'] = user
 
     output = ''
     output += '<h1>Welcome, '
@@ -276,21 +290,21 @@ def gdisconnect():
     result = h.request(url, 'GET')[0]
     print('result is ')
     print(result)
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        # del login_session['email']
-        del login_session['picture']
-        # response = make_response(json.dumps('Successfully disconnected.'), 200)
-        # response.headers['Content-Type'] = 'application/json'
-        # return response
-        return redirect(url_for('index'))
-    else:
-        response = make_response(
-            json.dumps('Failed to revoke token for given user.'), 400)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    # if result['status'] == '200':
+    del login_session['access_token']
+    del login_session['gplus_id']
+    del login_session['username']
+    # del login_session['email']
+    del login_session['picture']
+    # response = make_response(json.dumps('Successfully disconnected.'), 200)
+    # response.headers['Content-Type'] = 'application/json'
+    # return response
+    return redirect(url_for('index'))
+    # else:
+    #     response = make_response(
+    #         json.dumps('Failed to revoke token for given user.'), 400)
+    #     response.headers['Content-Type'] = 'application/json'
+    #     return response
 
 
 if __name__ == '__main__':
