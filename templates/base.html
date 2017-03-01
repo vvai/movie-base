@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+
+  <title>Movie base</title>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">Movie base</a>
+      </div>
+      <div id="navbar">
+        <ul class="nav navbar-nav pull-right">
+          {% if user.get('username') %}
+            <li><a href="/gdisconnect">({{user.get('username')}}) Logout</a></li>
+          {% else %}
+            <li><a href="/login">Login</a></li>
+          {% endif %}
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+  <div class="container main-content">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+</html>

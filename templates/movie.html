@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h1>"{{movie.title}}"</h1>
+  <div class="movie-information">
+    <div class="row movie-information__row">
+      <div class="col-md-4">Genre:</div>
+      <div class="col-md-8">{{movie.genre.name}}</div>
+    </div>
+    <div class="row movie-information__row">
+      <div class="col-md-4">Description:</div>
+      <div class="col-md-8">{{movie.description}}</div>
+    </div>
+    <div class="row movie-information__row">
+      <div class="col-md-4">Year:</div>
+      <div class="col-md-8">{{movie.year}}</div>
+    </div>
+    <div class="row movie-information__row">
+      <div class="col-md-4">Director:</div>
+      <div class="col-md-8">{{movie.director}}</div>
+    </div>
+  </div>
+
+  {% if user.get('username') %}
+    <div class="row movie-actions pull-right">
+      <a class="btn btn-default" href="{{url_for('editMovie', genre_id=movie.genre_id, movie_id=movie.id)}}">Edit</a>
+      <a class="btn btn-default" href="{{url_for('deleteMovie', genre_id=movie.genre_id, movie_id=movie.id)}}">Delete</a>
+    </div>
+  {% endif %}
+
+{% endblock %}

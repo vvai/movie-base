@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1> Are you sure you want to delete "{{movie.title}}"? </h1>
+
+<form action="{{url_for('deleteMovie', genre_id=movie.genre_id, movie_id=movie.id)}}" method = 'post'>
+
+<input class="btn btn-primary" type='submit', value = 'Delete'>
+<a class="btn btn-default" href="{{url_for('movie', genre_id=movie.genre_id, movie_id=movie.id)}}">Cancel</a>
+
+
+
+</form>
+
+{% endblock %}

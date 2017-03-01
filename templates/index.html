@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-4 genres-list">
+    <h2 class="genres-list__title">Genres</h2>
+    <ul class="genres-list__ul">
+      {% for g in genres %}
+        <li class="genres-list__item"><a href="{{url_for('showGenre', genre_id=g.id)}}">{{g.name}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="col-md-8 movies-list">
+    {% if user.get('username') %}
+      <a class="btn btn-default add-movie-button" href="{{url_for('newMovie')}}">Add movie</a>
+    {% endif %}
+
+    <h2 class="movies-list__title">Latest Movies</h2>
+    <ul class="movies-list__ul">
+      {% for m in movies %}
+        <li class="movies-list__item"><a href="{{url_for('movie', genre_id=m.genre_id, movie_id=m.id)}}">{{m.title}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
